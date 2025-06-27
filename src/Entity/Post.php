@@ -83,8 +83,8 @@ class Post
 
     private $author;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $Media = null;
+    #[ORM\Column(type: 'string')]
+    private string $Media;
 
     /**
      * @var Collection<int, Comment>
@@ -117,12 +117,12 @@ class Post
         return $this;
     }
 
-    public function getMedia(): ?string
+    public function getMedia(): string
     {
         return $this->Media;
     }
 
-    public function setMedia(?string $Media): static
+    public function setMedia(string $Media): static
     {
         $this->Media = $Media;
 

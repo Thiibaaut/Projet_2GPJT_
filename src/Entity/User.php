@@ -43,7 +43,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 200)]
     private ?string $nom = null;
 
-    #[ORM\Column(length: 200)]
+    #[ORM\Column(length: 200, nullable:true)]
     private ?string $imageFile = null;
 
     #[ORM\Column(type: 'string', nullable:true)]
@@ -70,10 +70,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Post::class, mappedBy: 'likes')]
     private Collection $user_post_likes;
 
+    /**
+     * @var Collection<int, self>
+     */
+
+    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'user')]
+    private Collection $suivi_user;
+
+    /**
+     * @var Collection<int, self>
+     */
+    #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'suivi_user')]
+    private Collection $user;
+
     public function __construct()
     {
         $this->posts = new ArrayCollection();
         $this->user_post_likes = new ArrayCollection();
+        $this->suivi_user = new ArrayCollection();
+        $this->user = new ArrayCollection();
     }
 
     /**
@@ -109,7 +124,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @see UserInterface
-     *
+     w*
      * @return list<string>
      */
     public function getRoles(): array
@@ -302,6 +317,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->imageFile = $imageFile;
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getSuiviUser(): Collection
+    {
+        return $this->suivi_user;
+    }
+
+    public function addSuiviUser(self $suiviUser): static
+    {
+        if (!$this->suivi_user->contains($suiviUser)) {
+            $this->suivi_user->add($suiviUser);
+        }
+
+        return $this;
+    }
+
+    public function removeSuiviUser(self $suiviUser): static
+    {
+        $this->suivi_user->removeElement($suiviUser);
+
+        return $this;
+    }
+
+    public function suiviByUser(User $user): bool
+    {
+        return $this->suivi_user->contains($user);
     }
 
 }

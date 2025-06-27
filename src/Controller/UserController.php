@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Post;
 use App\Entity\User;
 use App\Form\UserFormType;
 use App\Repository\PostRepository;
@@ -29,8 +30,12 @@ final class UserController extends AbstractController
     }
 
     #[Route('/profil/{id}', name: 'user_profil')]
-    public function profil($id, UserRepository $userRepository, PostRepository $postRepository): Response
+    public function profil(int $id, UserRepository $userRepository, PostRepository $postRepository): Response
     {
+        $utilisateur = $id;
+        $abonnee = $userRepository->abonnee($utilisateur);
+        $abonnement = $userRepository->abonnement($utilisateur);
+
         $profil = $userRepository->find($id);
         $user_created_id = $userRepository->find($id);
         $user_connected = $this->getUser();
@@ -39,6 +44,9 @@ final class UserController extends AbstractController
         return $this->render('user/profil.html.twig', [
             'user'=> $profil,
             'post'=> $post,
+            'id'=> $id,
+            'abonnee'=> $abonnee,
+            'abonnement'=> $abonnement,
         ]);
     }
 
@@ -80,5 +88,20 @@ final class UserController extends AbstractController
             'user' => $user,
             'form' => $form->createView(),
         ]);
+    }
+    #[Route('/follow_user/{id}', name: 'follow_user')]
+    public function like(int $id, User $user, EntityManagerInterface $entityManager): Response
+    {
+        $user_connecte = $this->getUser();
+
+        if($user->suiviByUser($user_connecte)) {
+            $user->removeSuiviUser($user_connecte);
+            $entityManager->flush();
+        } else {
+            $user->addSuiviUser($user_connecte);
+            $entityManager->flush();
+        }
+
+        return $this->redirectToRoute('user_profil', ['id' => $id]);
     }
 }

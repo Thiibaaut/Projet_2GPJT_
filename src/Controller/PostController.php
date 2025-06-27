@@ -15,6 +15,8 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 final class PostController extends AbstractController
 {
@@ -77,15 +79,34 @@ final class PostController extends AbstractController
 
 
     #[Route('/feed/newPost', name: 'app_post_new', methods: ['GET', 'POST'])]
-    public function new(\Symfony\Component\HttpFoundation\Request $request, EntityManagerInterface $entityManager): Response
+    public function new(\Symfony\Component\HttpFoundation\Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger, #[Autowire('images/post')] string $imagesDirectory): Response
     {
         $post = new Post();
         $form = $this->createForm(PostFormType::class, $post);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $post->setUserCreated($this->security->getUser());
-            $post->setCreation(new \DateTime('now'));
+            $Media = $form->get('media')->getData();
+            if ($Media) {
+                $originalFilename = pathinfo($Media->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$Media->guessExtension();
+
+                // Move the file to the directory where brochures are stored
+                try {
+                    $Media->move($imagesDirectory, $newFilename);
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                // updates the 'brochureFilename' property to store the PDF file name
+                // instead of its contents
+                $post->setMedia($newFilename);
+                $post->setUserCreated($this->security->getUser());
+                $post->setCreation(new \DateTime('now'));
+            }
+
             $entityManager->persist($post);
             $entityManager->flush();
 
@@ -99,7 +120,7 @@ final class PostController extends AbstractController
     }
 
     #[Route('/feed/post_edit_{id}', name: 'app_post_edit', methods: ['GET', 'POST'])]
-    public function edit(\Symfony\Component\HttpFoundation\Request $request, Post $post, EntityManagerInterface $entityManager): Response
+    public function edit(\Symfony\Component\HttpFoundation\Request $request, Post $post, EntityManagerInterface $entityManager, SluggerInterface $slugger, #[Autowire('images/post')] string $imagesDirectory): Response
     {
         if ($post->getUserCreated() !== $this->security->getUser()) {
             throw $this->createAccessDeniedException("Vous n'êtes pas autorisé à effectué cette action.");
@@ -109,6 +130,25 @@ final class PostController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $Media = $form->get('media')->getData();
+            if ($Media) {
+                $originalFilename = pathinfo($Media->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$Media->guessExtension();
+
+                // Move the file to the directory where brochures are stored
+                try {
+                    $Media->move($imagesDirectory, $newFilename);
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                // updates the 'brochureFilename' property to store the PDF file name
+                // instead of its contents
+                $post->setMedia($newFilename);
+            }
+
             $entityManager->flush();
 
             return $this->redirectToRoute('app_feed', [], Response::HTTP_SEE_OTHER);

@@ -42,6 +42,18 @@ a {
     align-self: center;
 }
 
+#button {
+    display: block;
+    margin: 0 auto;
+    font-size: 20px;
+    background: #00BFFF;
+    color: white;
+    border: #00BFFF;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
+    align-self: center;
+}
+
 .navigation {
     display: block;
     margin: 0 auto;

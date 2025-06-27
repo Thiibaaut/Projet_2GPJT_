@@ -20,9 +20,9 @@
             {{ form_row(registrationForm.agreeTerms, {
                 label: "Vous acceptez les conditions d'utilisations"
             }) }}
-                <button class="btn btn-success mb-5">{{ button_label|default('Crée') }}</button>
+                <button class="button mb-5">{{ button_label|default("S'inscrire") }}</button>
             {{ form_end(registrationForm) }}
         </div>
     </div>
-    <a class="navigation" href="{{ path('app_login') }}">Connexion</a>
+    <a class="btn" id="button" href="{{ path('app_login') }}">Se connecter</a>
 {% endblock %}

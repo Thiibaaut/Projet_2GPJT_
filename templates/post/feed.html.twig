@@ -9,13 +9,13 @@
     </div>
         {% for post in post %}
             <div class="container" style="padding-bottom: 50px">
-                    <div class="card" style="width: 40rem;">
+                    <div class="card">
                         <div class="card-body">
                             <a style="text-decoration: none"  href="{{ path('user_profil', {id: post.usercreated.id}) }}">
                                 {% if post.usercreated.imageFile %}
-                                    <img src="{{ asset('images/user/' ~ post.usercreated.imageFile) }}" id="pp_post" alt="Image de l'utilisateur">
+                                    <img src="{{ asset('images/user/' ~ post.usercreated.imageFile) }}" id="pp_profil" alt="Image de l'utilisateur">
                                 {% else %}
-                                    <p>pas d'image de profi:</p>
+                                    <p>pas d'image de profil</p>
                                 {% endif %}
                                 <h4 class="card-title">{{ post.usercreated.nom }}</h4>
                             </a>
@@ -23,11 +23,11 @@
                             <a style="text-decoration: none"  href="{{ path('app_post_show', {id: post.id}) }}">
                                 <h5 class="card-title">{{ post.titre }}</h5>
                             </a>
+                            <p class="card-text">{{ post.contenu }}</p>
 
                         {% if post.media != NULL %}
-                            <img src="{{ post.media }}" class="card-img-top" alt="...">
+                            <img src="{{ asset('images/post/' ~ post.media) }}" id="post_media" alt="Media du post">
                         {% endif %}
-                            <p class="card-text">{{ post.contenu }}</p>
                             <p class="card-text"><small class="text-muted">{{ post.creation|date('d-m-Y H:i:s', "Europe/Paris") }}</small></p>
                             <div class="mb-2">
                                 <a style="text-decoration: none"  href="{{ path('like_post', {id: post.id}) }}">

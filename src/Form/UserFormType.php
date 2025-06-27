@@ -17,11 +17,11 @@ class UserFormType extends AbstractType
             ->add('nom')
             ->add('bio')
             ->add('imageFile', FileType::class, [
-                'label' => 'brochure (PDF file)',
+                'label' => 'photo de profil',
                 'mapped' => false,
                 'required' => false,
             ])
-            ->add('profil_verif')
+            ->add('profil_public')
         ;
     }
 

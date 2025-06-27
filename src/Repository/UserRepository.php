@@ -57,4 +57,30 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function abonnee($id): int
+    {
+        $entityManager = $this->getEntityManager();
+
+        $query = $entityManager->createQuery(
+            'SELECT COUNT(u.id)
+            FROM App\Entity\User u
+            WHERE :id MEMBER OF u.user'
+        )->setParameter('id', $id);
+
+        return $query->getSingleScalarResult();
+    }
+
+    public function abonnement($id): int
+    {
+        $entityManager = $this->getEntityManager();
+
+        $query = $entityManager->createQuery(
+            'SELECT COUNT(u.id)
+            FROM App\Entity\User u
+            WHERE :id MEMBER OF u.suivi_user'
+        )->setParameter('id', $id);
+
+        return $query->getSingleScalarResult();
+    }
 }

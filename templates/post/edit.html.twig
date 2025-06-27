@@ -5,9 +5,24 @@
 {% block body %}
     <div class="container">
         {{ form_start(form) }}
-        {{ form_widget(form) }}
+        <div class="row">
+            <div class="col-3">
+                {{ form_row(form.titre, {'attr': {'class': 'form-control'},
+                    label: "Titre du post"
+                }) }}
 
-        <button class="btn btn-success">{{ button_label|default('Enregistrer') }}</button>
+                {{ form_row(form.contenu, {'attr': {'class': 'form-control'},
+                    label: "Description"
+                }) }}
+
+                {{ form_row(form.media, {'attr': {'class': 'form-control'},
+                    label: "Media"
+                }) }}
+            </div>
+        </div>
+
+        <button class="btn btn-success mt-3">{{ button_label|default('Modifier') }}</button>
         {{ form_end(form) }}
+        <a class="btn btn-secondary mt-2" href="{{ path('app_feed') }}">Retour</a>
     </div>
 {% endblock %}
